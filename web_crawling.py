@@ -48,3 +48,6 @@ search.send_keys(Keys.ENTER)  # 엔터버튼 누르기
 
 res = browser.page_source  # 페이지 소스 가져오기
 soup = BeautifulSoup(res, 'html.parser')  # html 파싱하여  가져온다
+
+time.sleep(500)
+
