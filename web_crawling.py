@@ -7,6 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import json
+from selenium.webdriver.common.by import By
 
 options = webdriver.ChromeOptions()
 options.add_experimental_option("excludeSwitches", ["enable-logging"])
@@ -28,26 +29,18 @@ def time_wait(num, code):
         browser.quit()
     return wait
 
-browser.get("https://map.naver.com/")
+query = '투썸 명동사거리점'
+
+browser.get("https://m.search.naver.com/search.naver?query="+query)
 
 time.sleep(5)
 
 # css를 찾을때 까지 10초 대기
-time_wait(10, 'div.input_box > input.input_search')
+#time_wait(10, 'div.input_box > input.input_search')
 
 keyword = "투썸 명동사거리점"
-
-browser.find_element('xpath','//*[@id="search-input"]').clear()
-browser.find_element('xpath','//*[@id="search-input"]').send_keys(keyword)
-browser.find_element('xpath','//*[@id="header"]/div[1]/fieldset/button').click()
-
-# 검색창 찾기
-search = browser.find_element_by_css_selector('div.input_box > input.input_search')
-search.send_keys(keyword)  # 검색어 입력
-search.send_keys(Keys.ENTER)  # 엔터버튼 누르기
-
-res = browser.page_source  # 페이지 소스 가져오기
-soup = BeautifulSoup(res, 'html.parser')  # html 파싱하여  가져온다
-
+browser.find_element(By.XPATH, '//*[@id="place-main-section-root"]/div/div[3]/div/ul/li[2]/div/a/div').click()
+a = browser.find_element(By.XPATH, '//*[@id="_title"]/a/span[1]').text
+print(a)
 time.sleep(500)
 
