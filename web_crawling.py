@@ -18,16 +18,6 @@ browser = webdriver.Chrome(options=options)
 # with open('file.json','r', encoding='utf-8-sig') as f:
 #    data = json.load(f)
 #    data = data['storeName']
-    
-# css 찾을때 까지 10초대기
-def time_wait(num, code):
-    try:
-        wait = WebDriverWait(browser, num).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, code)))
-    except:
-        print(code, '태그를 찾지 못하였습니다.')
-        browser.quit()
-    return wait
 
 # Json 파일
 def toJson(store_list):
@@ -66,19 +56,19 @@ for span_tag in span_tags:
     
     print(split_time)
     if(day_text == '월'): 
-        store_dict['businessHours']['onMon'] = {'monOpen':split_time[0], 'monClosed':split_time[1]}
+        store_dict['businessHours']['onMon'] = {'open':split_time[0], 'closed':split_time[1]}
     elif(day_text == '화'): 
-        store_dict['businessHours']['onTue'] = {'tueOpen':split_time[0], 'tueClosed':split_time[1]}
+        store_dict['businessHours']['onTue'] = {'open':split_time[0], 'closed':split_time[1]}
     elif(day_text == '수'): 
-        store_dict['businessHours']['onWed'] = {'wedOpen':split_time[0], 'wedClosed':split_time[1]}
+        store_dict['businessHours']['onWed'] = {'open':split_time[0], 'closed':split_time[1]}
     elif(day_text == '목'): 
-        store_dict['businessHours']['onThu'] = {'thuOpen':split_time[0], 'thuClosed':split_time[1]}
+        store_dict['businessHours']['onThu'] = {'open':split_time[0], 'closed':split_time[1]}
     elif(day_text == '금'): 
-        store_dict['businessHours']['onFri'] = {'friOpen':split_time[0], 'friClosed':split_time[1]}
+        store_dict['businessHours']['onFri'] = {'open':split_time[0], 'closed':split_time[1]}
     elif(day_text == '토'): 
-        store_dict['businessHours']['onSat'] = {'satOpen':split_time[0], 'satClosed':split_time[1]}
+        store_dict['businessHours']['onSat'] = {'open':split_time[0], 'closed':split_time[1]}
     elif(day_text == '일'): 
-        store_dict['businessHours']['onSun'] = {'sunOpen':split_time[0], 'sunClosed':split_time[1]}
+        store_dict['businessHours']['onSun'] = {'open':split_time[0], 'closed':split_time[1]}
         
     
 store_list.append(store_dict)
