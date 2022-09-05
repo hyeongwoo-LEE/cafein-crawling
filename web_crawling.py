@@ -25,15 +25,22 @@ def toJson(store_list):
         json.dump(store_list, file, ensure_ascii=False, indent='\t')
 
 
-query = '투썸 명동사거리점'
-
+query = '카페 바람'
 browser.get("https://m.search.naver.com/search.naver?query="+query)
 time.sleep(0.5)
 
-browser.find_element(By.XPATH, '//*[@id="place-main-section-root"]/div/div[3]/div/ul/li[2]/div/a/div/div').click()
-a = browser.find_element(By.XPATH, '//*[@id="_title"]/a/span[1]').text
-
 soup = BeautifulSoup(browser.page_source, 'html.parser')
+
+#검색 결과 다중
+if(soup.find('div', {'class', 'VLTHu'}) == None):
+    store_list = soup.find_all('span', {'class':'place_bluelink YwYLL'})
+    for store in store_list:
+        if(store.get_text() == query):
+            print(store.get_text())
+   # browser.find_element_by_xpath('//*[@id="sbtc"]/button').click()
+
+
+browser.find_element(By.XPATH, '//*[@id="place-main-section-root"]/div/div[3]/div/ul/li[2]/div/a/div/div').click()
 
 span_tags = soup.find_all("span", {'class':'ob_be'})
 
@@ -74,7 +81,7 @@ for span_tag in span_tags:
 store_list.append(store_dict)
 print(store_list)
 
-toJson(store_list)
+#toJson(store_list)
     
     
 
