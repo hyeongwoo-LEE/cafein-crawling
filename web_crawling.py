@@ -34,7 +34,13 @@ store_list = []
 not_exist = []
 
 for item in items:
+    
+    # 카페별 딕셔너리 생성
+    store_dict = {"storeName" : item['storeName']}
+    
+    # 검색어 keyword
     query = item['storeName'].replace("메가커피","메가MGC커피")
+    
     browser.get("https://m.place.naver.com/place/list?query="+ query + "&level=top")
 
     time.sleep(3)
@@ -72,8 +78,6 @@ for item in items:
          
     soup = BeautifulSoup(browser.page_source, 'html.parser')
 
-    # 카페별 딕셔너리 생성
-    store_dict = {"storeName" : query}
     
     # 전화번호 데이터
     try:
@@ -112,6 +116,7 @@ for item in items:
         open = split_time[0][0:5]
         closed = split_time[1][0:5]
 
+        #요일별 영업시간 딕셔너리 생성
         business_hour_dict = {'open':open, 'closed':closed}
         
         if(day_text == '월'): 
