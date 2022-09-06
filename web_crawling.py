@@ -25,43 +25,53 @@ def toJson(store_list):
         json.dump(store_list, file, ensure_ascii=False, indent='\t')
 
 
-query = '카페 바람'
-browser.get("https://m.search.naver.com/search.naver?query="+query)
-time.sleep(0.5)
+query = '바람커피'
+browser.get("https://m.place.naver.com/place/list?query="+ query + "&level=top")
+#ser.get("https://m.search.naver.com/search.naver?query="+query)
+time.sleep(10)
 
 soup = BeautifulSoup(browser.page_source, 'html.parser')
 
+
 #검색 결과 다중
-if(soup.find('div', {'class', 'VLTHu'}) == None):
-    store_list = soup.find_all('span', {'class':'place_bluelink YwYLL'})
-    for store in store_list:
-        if(store.get_text() == query):
-            print(store.get_text())
-   # browser.find_element_by_xpath('//*[@id="sbtc"]/button').click()
+store_list = soup.find_all('span', {'class':'place_bluelink YwYLL'})
 
+for store in store_list:
+    if(store.get_text() == query):
+        print(store.get_text())
+        print(store.parent.parent.parent.get_href())
+        browser.find_element(By.CSS_SELECTOR, store).click()
+        browser.find_element(By.XPATH, '//*[@id="_list_scroll_container"]/div/div/div[2]/ul/li[1]/div[2]/a[1]/div/div/span[1]').click()
+        break
+        
+time.sleep(5)
+browser.find_element(By.XPATH, '//*[@id="app-root"]/div/div/div/div[6]/div/div[1]/div/ul/li[2]/div/a/div[1]/div/span').click()
 
-browser.find_element(By.XPATH, '//*[@id="place-main-section-root"]/div/div[3]/div/ul/li[2]/div/a/div/div').click()
+soup2 = BeautifulSoup(browser.page_source, 'html.parser')
 
-span_tags = soup.find_all("span", {'class':'ob_be'})
+span_tags = soup2.find_all('span', {'class':'ob_be'})
 
 #카페 빈 리스트 생성
 store_list = []
 
-store_name = browser.find_element(By.XPATH, '//*[@id="_title"]/a/span[1]').text
-
 #카페별 딕셔너리 생성
-store_dict = {"storeName" : store_name}
+store_dict = {"storeName" : query}
 
 #영업시간 딕셔너리 생성
-store_dict['businessHours'] = {}
+store_dict['businessHours'] = {'onMon':None, 'onTue':None, 'onWed':None, 'onThu':None, 'onFri':None, 'onSat':None, 'onSun':None}
 
+cnt = 0
 for span_tag in span_tags:
+    
+    if(span_tag.find("span", {'class':'kGc0c'}) == None): break
+    
     day_text = span_tag.find("span", {'class':'kGc0c'}).get_text()
     time_text = span_tag.find("div", {'class': 'qo7A2'}).get_text()
     
     split_time = time_text.replace(" ","").split("-")
     
-    print(split_time)
+    if(len(split_time) < 2):continue
+    
     if(day_text == '월'): 
         store_dict['businessHours']['onMon'] = {'open':split_time[0], 'closed':split_time[1]}
     elif(day_text == '화'): 
@@ -81,7 +91,7 @@ for span_tag in span_tags:
 store_list.append(store_dict)
 print(store_list)
 
-#toJson(store_list)
+toJson(store_list)
     
     
 
