@@ -27,11 +27,15 @@ with open('store_list_동대문구.json','r', encoding='utf-8-sig') as f:
     total_cnt = data['totalCnt']
     items = data['storeList']
     
+    
+#카페 빈 리스트 생성
+store_list = []
+
 for item in items:
     query = item['storeName']
     browser.get("https://m.place.naver.com/place/list?query="+ query + "&level=top")
 
-    time.sleep(5)
+    time.sleep(3)
 
     soup = BeautifulSoup(browser.page_source, 'html.parser')
 
@@ -51,29 +55,29 @@ for item in items:
                 browser.find_element(By.XPATH, '//*[@id="_list_scroll_container"]/div/div/div[2]/ul/li/div[1]').click() 
             break
         loop_cnt += 1
+    else:
+        print("검색 카페가 존재하지 않음 : ", query)
+        continue
     
-    time.sleep(5)
+    time.sleep(6)
     
     try:
-        browser.find_element(By.XPATH, '//*[@id="app-root"]/div/div/div/div[6]/div/div[2]/div/ul/li[2]/div/a/div/div').click()
-
-    except Exception:
-        browser.find_element(By.XPATH, '//*[@id="app-root"]/div/div/div/div[7]/div/div[2]/div/ul/li[2]/div/a/div/div').click()
+        browser.find_element(By.XPATH, '//*[@id="app-root"]/div/div/div/div[6]/div/div[2]/div/ul/li[2]/div/a/div').click()
     except:
-        print(query)
-        pass
+        print("영업시간 데이터가 없음 : ", query)
+        continue
          
     soup = BeautifulSoup(browser.page_source, 'html.parser')
-    
-    #카페 빈 리스트 생성
-    store_list = []
 
     #카페별 딕셔너리 생성
     store_dict = {"storeName" : query}
     
     #전화번호 데이터
-    phone = soup.find('span', {'class':'dry01'}).get_text()
-    store_dict['phone'] = phone
+    try:
+        phone = soup.find('span', {'class':'dry01'}).get_text()
+        store_dict['phone'] = phone
+    except:
+        store_dict['phone'] = None
 
     #영업시간 데이터
     span_tags = soup.find_all('span', {'class':'ob_be'})
