@@ -36,14 +36,15 @@ soup = BeautifulSoup(browser.page_source, 'html.parser')
 #검색 결과 다중
 store_list = soup.find_all('span', {'class':'place_bluelink YwYLL'})
 
+loop_cnt = 1;
 for store in store_list:
     if(store.get_text() == query):
         print(store.get_text())
-        print(store.parent.parent.parent.get_href())
-        browser.find_element(By.CSS_SELECTOR, store).click()
-        browser.find_element(By.XPATH, '//*[@id="_list_scroll_container"]/div/div/div[2]/ul/li[1]/div[2]/a[1]/div/div/span[1]').click()
-        break
         
+        browser.find_element(By.XPATH, '//*[@id="_list_scroll_container"]/div/div/div[2]/ul/li['+str(loop_cnt)+']/div[2]/a[1]/div/div/span[1]').click()
+        break
+    loop_cnt += 1
+    
 time.sleep(5)
 browser.find_element(By.XPATH, '//*[@id="app-root"]/div/div/div/div[6]/div/div[1]/div/ul/li[2]/div/a/div[1]/div/span').click()
 
