@@ -15,9 +15,9 @@ browser = webdriver.Chrome(options=options)
 
 
 # Json 파일
-def toJson(store_list):
+def toJson(json_list):
     with open('store_info_data.json', 'w', encoding='utf-8') as file :  
-        json.dump(store_list, file, ensure_ascii=False, indent='\t')
+        json.dump(json_list, file, ensure_ascii=False, indent='\t')
 
 
 
@@ -145,8 +145,8 @@ for item in items:
             
             
         
-    store_list.append(store_dict)
-    print(store_list)
+    json_list.append(store_dict)
+    print(store_dict)
 
 # 검색 결과가 없는 카페 출력
 for store_name in not_exist:
