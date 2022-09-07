@@ -29,7 +29,7 @@ with open('store_list_동대문구.json','r', encoding='utf-8-sig') as f:
     
     
 # json 빈 리스트 생성
-store_list = []
+json_list = []
 
 not_exist = []
 
@@ -153,7 +153,7 @@ for store_name in not_exist:
     print(store_name)
     
 #수집한 데이터로 json 파일 생성
-toJson(store_list)
+toJson(json_list)
     
     
 
