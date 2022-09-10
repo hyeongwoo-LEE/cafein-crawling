@@ -14,15 +14,14 @@ options.add_experimental_option("excludeSwitches", ["enable-logging"])
 browser = webdriver.Chrome(options=options)
 
 
-# Json 파일
+
 def toJson(json_list):
     with open('store_info_data.json', 'w', encoding='utf-8') as file :  
         json.dump(json_list, file, ensure_ascii=False, indent='\t')
 
 
-
 # 검색 keyword로 보낼 json 파일 로딩
-with open('store_list_동대문구.json','r', encoding='utf-8-sig') as f:
+with open('store_list_강서구.json','r', encoding='utf-8-sig') as f:
     data = json.load(f)
     total_cnt = data['totalCnt']
     items = data['storeList']
@@ -113,11 +112,11 @@ for item in items:
         
         if(len(split_time) < 2): continue
          
-        open = split_time[0][0:5]
-        closed = split_time[1][0:5]
+        open_time = split_time[0][0:5]
+        closed_time = split_time[1][0:5]
 
         #요일별 영업시간 딕셔너리 생성
-        business_hour_dict = {'open':open, 'closed':closed}
+        business_hour_dict = {'open':open_time, 'closed':closed_time}
         
         if(day_text == '월'): 
             store_dict['businessHours']['onMon'] = business_hour_dict
@@ -153,7 +152,9 @@ for store_name in not_exist:
     print(store_name)
     
 #수집한 데이터로 json 파일 생성
+# Json 파일
 toJson(json_list)
+
     
     
 
