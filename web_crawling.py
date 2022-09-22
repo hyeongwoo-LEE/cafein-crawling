@@ -21,7 +21,7 @@ def toJson(json_list):
 
 
 # 검색 keyword로 보낼 json 파일 로딩
-with open('store_list_강서구.json','r', encoding='utf-8-sig') as f:
+with open('store_list_.json','r', encoding='utf-8-sig') as f:
     data = json.load(f)
     total_cnt = data['totalCnt']
     items = data['storeList']
@@ -39,6 +39,7 @@ for item in items:
     
     # 검색어 keyword
     query = item['storeName'].replace("메가커피","메가MGC커피")
+    query = "메가MGC커피 약수역점"
     
     browser.get("https://m.place.naver.com/place/list?query="+ query + "&level=top")
 
@@ -68,13 +69,18 @@ for item in items:
         continue
     
     time.sleep(6)
-    
+
+
     try:
         browser.find_element(By.XPATH, '//*[@id="app-root"]/div/div/div/div[6]/div/div[2]/div/ul/li[2]/div/a/div').click()
     except:
-        print("영업시간 데이터가 없음 : ", query)
-        continue
-         
+        try:
+            browser.find_element(By.XPATH, '//*[@id="app-root"]/div/div/div/div[6]/div/div[1]/div/ul/li[2]/div/a/div').click()
+        except:
+            print("영업시간 데이터가 없음 : ", query)
+            continue
+        
+          
     soup = BeautifulSoup(browser.page_source, 'html.parser')
 
     
@@ -106,7 +112,8 @@ for item in items:
         # 영업시간 데이터
         time_text = span_tag.find("div", {'class': 'qo7A2'}).get_text()
 
-        if "새벽" in time_text: continue
+        if "새벽" in time_text: 
+            time_text = time_text.replace("새벽 ", "")
         
         split_time = time_text.replace(" ","").split("-")
         
