@@ -39,7 +39,6 @@ for item in items:
     
     # 검색어 keyword
     query = item['storeName'].replace("메가커피","메가MGC커피")
-    query = "메가MGC커피 약수역점"
     
     browser.get("https://m.place.naver.com/place/list?query="+ query + "&level=top")
 
@@ -114,6 +113,9 @@ for item in items:
 
         if "새벽" in time_text: 
             time_text = time_text.replace("새벽 ", "")
+            
+        if "개천절" in time_text:
+            time_text = time_text.replace("개천절", "")
         
         split_time = time_text.replace(" ","").split("-")
         
