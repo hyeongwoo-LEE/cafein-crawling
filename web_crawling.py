@@ -1,9 +1,4 @@
 from selenium import webdriver
-import selenium
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import requests
 from bs4 import BeautifulSoup
 import time
 import json
@@ -57,8 +52,10 @@ for item in items:
             print(store.get_text())
 
             try:
+                # 검색 결과가 다중일 경우
                 browser.find_element(By.XPATH, '//*[@id="_list_scroll_container"]/div/div/div[2]/ul/li['+str(loop_cnt)+']/div[2]/a[1]/div/div/span[1]').click()
             except:
+                # 검색결과가 단일일 경우
                 browser.find_element(By.XPATH, '//*[@id="_list_scroll_container"]/div/div/div[2]/ul/li/div[1]').click() 
             break
         loop_cnt += 1
