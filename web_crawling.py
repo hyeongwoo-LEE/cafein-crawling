@@ -110,9 +110,12 @@ for item in items:
 
         if "새벽" in time_text: 
             time_text = time_text.replace("새벽 ", "")
+           
+        if "대체공휴일" in time_text:
+            time_text = time_text.replace("대체공휴일", "")   
             
-        if "개천절" in time_text:
-            time_text = time_text.replace("개천절", "")
+        if "한글날" in time_text:
+            time_text = time_text.replace("한글날", "")
         
         split_time = time_text.replace(" ","").split("-")
         
