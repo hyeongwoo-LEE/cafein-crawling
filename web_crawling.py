@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import time
 import json
 from selenium.webdriver.common.by import By
+import re
 
 options = webdriver.ChromeOptions()
 options.add_experimental_option("excludeSwitches", ["enable-logging"])
@@ -108,18 +109,21 @@ for item in items:
         # 영업시간 데이터
         time_text = span_tag.find("div", {'class': 'qo7A2'}).get_text()
 
-        if "새벽" in time_text: 
-            time_text = time_text.replace("새벽 ", "")
-           
-        if "대체공휴일" in time_text:
-            time_text = time_text.replace("대체공휴일", "")   
-            
-        if "한글날" in time_text:
-            time_text = time_text.replace("한글날", "")
+        #휴무 데이터 처리
         
-        split_time = time_text.replace(" ","").split("-")
         
-        if(len(split_time) < 2): continue
+        
+        
+        #영업시간 데이터 추출
+        business_hour_pattern = re.compile('\d{2}:\d{2} - \d{2}:\d{2}')
+        arr_bussiness_hour = business_hour_pattern.findall(time_text)
+
+        if(len(arr_bussiness_hour) < 1): continue
+        
+        bussiness_hour = arr_bussiness_hour[0]
+        
+        #오픈, 마감시간 추출
+        split_time = bussiness_hour.replace(" ","").split("-")   
          
         open_time = split_time[0][0:5]
         closed_time = split_time[1][0:5]
