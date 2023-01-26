@@ -10,7 +10,6 @@ options.add_experimental_option("excludeSwitches", ["enable-logging"])
 browser = webdriver.Chrome(options=options)
 
 
-
 def toJson(json_list):
     with open('store_info_data.json', 'w', encoding='utf-8') as file :  
         json.dump(json_list, file, ensure_ascii=False, indent='\t')
@@ -21,7 +20,6 @@ with open('store_list_.json','r', encoding='utf-8-sig') as f:
     data = json.load(f)
     total_cnt = data['totalCnt']
     items = data['storeList']
-    
     
 # json 빈 리스트 생성
 json_list = []
@@ -53,8 +51,8 @@ for item in items:
             print(store.get_text())
 
             try:
-                # 검색 결과가 다중일 경우
-                browser.find_element(By.XPATH, '//*[@id="_list_scroll_container"]/div/div/div[2]/ul/li['+str(loop_cnt)+']/div[2]/a[1]/div/div/span[1]').click()
+                # 검색 결과가 다중일 경우        
+                browser.find_element(By.XPATH, '//*[@id="_list_scroll_container"]/div/div/div[3]/ul/li['+str(loop_cnt)+']/div[1]/div[2]/a[1]/div/div').click()
             except:
                 # 검색결과가 단일일 경우
                 browser.find_element(By.XPATH, '//*[@id="_list_scroll_container"]/div/div/div[2]/ul/li/div[1]').click() 
@@ -67,12 +65,11 @@ for item in items:
     
     time.sleep(6)
 
-
     try:
-        browser.find_element(By.XPATH, '//*[@id="app-root"]/div/div/div/div[6]/div/div[2]/div/ul/li[2]/div/a/div').click()
+        browser.find_element(By.XPATH, '//*[@id="app-root"]/div/div/div/div[6]/div/div[1]/div/div/div[2]/div/a/div').click()
     except:
         try:
-            browser.find_element(By.XPATH, '//*[@id="app-root"]/div/div/div/div[6]/div/div[1]/div/ul/li[2]/div/a/div').click()
+            browser.find_element(By.XPATH, '//*[@id="app-root"]/div/div/div/div[6]/div/div[2]/div/div/div[2]/div/a/div').click()
         except:
             print("영업시간 데이터가 없음 : ", query)
             continue
@@ -83,53 +80,68 @@ for item in items:
     
     # 전화번호 데이터
     try:
-        phone = soup.find('span', {'class':'dry01'}).get_text()
+        phone = soup.find('span', {'class':'xlx7Q'}).get_text()
         store_dict['phone'] = phone
     except:
         store_dict['phone'] = None
 
     # 영업시간 데이터
-    span_tags = soup.find_all('span', {'class':'ob_be'})
+    span_tags = soup.find_all('span', {'class':'A_cdD'})
+    if len(span_tags) < 1:
+        #매장, 드라이브 스루 나눠서 데이터를 제공해주는 경우 span 태그 대신 div 태그를 사용함
+        span_tags = soup.find_all('div', {'class':'A_cdD'})
 
     # 영업시간 딕셔너리 생성
     store_dict['businessHours'] = {'onMon':None, 'onTue':None, 'onWed':None, 'onThu':None, 'onFri':None, 'onSat':None, 'onSun':None}
    
     # 요일별 영업시간 데이터 수집
     for span_tag in span_tags:
-        
-        if(span_tag.find("span", {'class':'kGc0c'}) == None): 
+        if(span_tag.find('span',{'class':'i8cJw'}) == None):
             continue
         
-        # 요일 데이터
-        day_text = span_tag.find("span", {'class':'kGc0c'}).get_text()
+        day_text = span_tag.find('span',{'class':'i8cJw'}).get_text()
         
         if(day_text != '매일'):
             day_text = day_text[0]
         
-        # 영업시간 데이터
-        time_text = span_tag.find("div", {'class': 'qo7A2'}).get_text()
-
+        #영업시간 정보 - String 타입
+        time_text = span_tag.find("div", {'class': 'H3ua4'})
+        
+        if time_text == None:
+            #매장, 드라이브 스루 나눠서 데이터를 제공해주는 경우 div 태그 대신 span 태그를 사용함
+            time_text = span_tag.find("span", {'class': 'H3ua4'})
+        
+        time_text = time_text.getText()
+        
+        # 영업 시간 정보 초기화
+        holidayType = None
+        open_time = None
+        closed_time = None
         #휴무 데이터 처리
+        if '정기휴무' in time_text:
+            holidayType = "EVERY_WEEK"
         
+        elif '휴무' in time_text:
+            holidayType = "TEMPORARY"
         
+        else:
+            #영업시간 데이터 추출
+            business_hour_pattern = re.compile('\d{2}:\d{2} - \d{2}:\d{2}')
         
+            arr_bussiness_hour = business_hour_pattern.findall(time_text)
+            
+            if len(arr_bussiness_hour) < 1: continue
         
-        #영업시간 데이터 추출
-        business_hour_pattern = re.compile('\d{2}:\d{2} - \d{2}:\d{2}')
-        arr_bussiness_hour = business_hour_pattern.findall(time_text)
-
-        if(len(arr_bussiness_hour) < 1): continue
+            bussiness_hour = arr_bussiness_hour[0]
         
-        bussiness_hour = arr_bussiness_hour[0]
-        
-        #오픈, 마감시간 추출
-        split_time = bussiness_hour.replace(" ","").split("-")   
+            #오픈, 마감시간 추출
+            split_time = bussiness_hour.replace(" ","").split("-")   
          
-        open_time = split_time[0][0:5]
-        closed_time = split_time[1][0:5]
+            open_time = split_time[0][0:5]
+            closed_time = split_time[1][0:5]
 
         #요일별 영업시간 딕셔너리 생성
-        business_hour_dict = {'open':open_time, 'closed':closed_time}
+        business_hour_dict = {'open':open_time, 'closed':closed_time, 'holidayType':holidayType}
         
         if(day_text == '월'): 
             store_dict['businessHours']['onMon'] = business_hour_dict
