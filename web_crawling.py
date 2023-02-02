@@ -4,10 +4,10 @@ import time
 import json
 from selenium.webdriver.common.by import By
 import re
+from selenium.common.exceptions import NoSuchElementException
 
 options = webdriver.ChromeOptions()
 options.add_experimental_option("excludeSwitches", ["enable-logging"])
-browser = webdriver.Chrome(options=options)
 
 
 def toJson(json_list):
@@ -23,11 +23,17 @@ with open('store_list_.json','r', encoding='utf-8-sig') as f:
     
 # json 빈 리스트 생성
 json_list = []
-
 not_exist = []
 
+browser = webdriver.Chrome(options=options)
+cnt = 0
 for item in items:
     
+    if cnt % 90 == 0:
+        browser = webdriver.Chrome(options=options)
+    
+    cnt+=1
+    print(cnt)
     # 카페별 딕셔너리 생성
     store_dict = {"storeName" : item['storeName']}
     
@@ -45,17 +51,25 @@ for item in items:
     store_list = soup.find_all('span', {'class':'place_bluelink YwYLL'})
 
     loop_cnt = 1;
-    
+    print(len(store_list))
     for store in store_list:
+        print(store.get_text() == query)
         if(store.get_text() == query):
+            print('들어옴')
             print(store.get_text())
-
             try:
-                # 검색 결과가 다중일 경우        
+                # 검색결과가 다중일 경우        
                 browser.find_element(By.XPATH, '//*[@id="_list_scroll_container"]/div/div/div[3]/ul/li['+str(loop_cnt)+']/div[1]/div[2]/a[1]/div/div').click()
-            except:
+            except NoSuchElementException as e:
                 # 검색결과가 단일일 경우
-                browser.find_element(By.XPATH, '//*[@id="_list_scroll_container"]/div/div/div[2]/ul/li/div[1]').click() 
+                try:
+                    browser.find_element(By.XPATH, '//*[@id="_list_scroll_container"]/div/div/div[3]/ul/li/div[1]/div[2]/a[1]/div/div').click()
+                except NoSuchElementException as e:
+                    try:
+                        browser.find_element(By.XPATH, '//*[@id="_list_scroll_container"]/div/div/div[2]/ul/li/div[1]/div/a[1]/div/div').click()
+                    except NoSuchElementException as e:
+                        browser.find_element(By.XPATH, '//*[@id="_list_scroll_container"]/div/div/div[3]/ul/li/div[1]/div/a[1]/div/div').click()
+            
             break
         loop_cnt += 1
     else:
@@ -63,7 +77,7 @@ for item in items:
         not_exist.append(query)
         continue
     
-    time.sleep(6)
+    time.sleep(5)
 
     try:
         browser.find_element(By.XPATH, '//*[@id="app-root"]/div/div/div/div[6]/div/div[1]/div/div/div[2]/div/a/div').click()
